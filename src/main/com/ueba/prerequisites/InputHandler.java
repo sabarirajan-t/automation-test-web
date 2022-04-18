@@ -42,7 +42,8 @@ public class InputHandler{
     public static JSONObject getJMXDetails(){
         JSONObject jmxDetails=new JSONObject();
         jmxDetails.put("jmxHost",props.getProperty("jmxhost"));
-        jmxDetails.put("jmxPort",props.getProperty("jmxport"));
+        jmxDetails.put("jmxPortUeba",props.getProperty("jmxport_ueba"));
+        jmxDetails.put("jmxPortEs",props.getProperty("jmxport_es"));
         return jmxDetails;
     }
 

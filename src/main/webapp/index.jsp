@@ -65,23 +65,43 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>SO question 4112686</title>
+        <title>Test</title>
         <script src="http://code.jquery.com/jquery-latest.min.js"></script>
         <script>
-            $(document).on("click", "#somebutton", function() { 
-                $.get("test", function(responseText) {  
-                    $("#somediv").text(responseText);       
+            $(document).on("click", "#somebutton", function() {
+                $.get("start", function(responseJson) { 
+                    console.log(responseJson['max_memory']);
+                    $("#maxmemory").append(responseJson['max_memory']);
+                    $("#avgmemory").append(responseJson['avg_memory']);
+                    $("#maxcpu").append(responseJson['max_cpu']);
+                    $("#avgcpu").append(responseJson['avg_cpu']);
                 });
             });
         </script>
+        <script>
+            $(document).on("click", "#somebutton1", function() {
+                $.post("stop",{ param : "tostop"},function() { 
+                    console.log("stopped");
+                });
+            });
+
+        </script>
     </head>
     <body>
-        <button id="somebutton">For cpu and Memory performance</button>
-        <div id="somediv"></div>
-        <p id="maxmemory">Max. Memory:</div>
-        <p id="maxmemory">Avg. Memory:</div>
-        <p id="maxmemory">Max. CPU:</div>
-        <p id="maxmemory">Max. CPU:</div>
+        <button id="somebutton">Start CPU and Memory Performance</button>
+        <button id="somebutton1">Stop CPU and Memory Performance</button>
+        <div id="somediv"><h2>UEBA:</h2></div>
+        <p id="maxmemory">Max. Memory:</p>
+        <p id="avgmemory">Avg. Memory:</p>
+        <p id="maxcpu">Max. CPU:</p>
+        <p id="avgcpu">Avg. CPU:</p>
+        <br>
+        <br>
+        <div id="somediv"><h2>ES:</h2></div>
+        <p id="maxmemory">Max. Memory:</p>
+        <p id="avgmemory">Avg. Memory:</p>
+        <p id="maxcpu">Max. CPU:</p>
+        <p id="avgcpu">Avg. CPU:</p>
     </body>
 </html>
 

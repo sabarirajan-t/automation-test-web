@@ -24,7 +24,7 @@ public class MemoryCalc {
         System.out.println("Max Memory:"+ Collections.max(memoryMap.values()));
         HashMap<String,Double> data=new HashMap<>();
         data.put("avg_memory",Double.valueOf(memoryMap.values().stream().mapToDouble(d->d).average().orElse(0)));
-        data.put("max_meory",(double)Collections.max(memoryMap.values()));
+        data.put("max_memory",(double)Collections.max(memoryMap.values()));
         return data;
     }
 }
