@@ -1,11 +1,10 @@
 package com.ueba.performance;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.ueba.prerequisites.InputHandler;
 import org.json.JSONObject;
 
-import javax.servlet.ServletException;
+import javax.management.remote.JMXConnector;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -18,21 +17,18 @@ import java.util.concurrent.Executors;
 
 @WebServlet("/")
 public class StartPerformance extends HttpServlet {
-
-//    JSONObject jmxDetails=InputHandler.getJMXDetails();
-//    String jmxhost=jmxDetails.getString("jmxHost");
-//    String jmxport_ueba=jmxDetails.getString("jmxPortUeba");
-//    String jmxport_es=jmxDetails.getString("jmxPortEs");
-
-
-    HashMap<String,Double> map=new HashMap<>();
-    HashMap<String,Double> map1=new HashMap<>();
+    Map<Long, Double> uebaCpuMap=new HashMap<>();
+    Map<Long, Long> uebaMemoryMap=new HashMap<>();
+    Map<Long, Double> esCpuMap=new HashMap<>();
+    Map<Long, Long> esMemoryMap=new HashMap<>();
+    HashMap<String,String> data=new HashMap<>();
     int maxTime;
     int seconds;
 
+
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String action=req.getParameter("param").toString();
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
+        String action= req.getParameter("param");
         try{
             if(action.equals("tostop")){
                 seconds=maxTime;
@@ -43,82 +39,108 @@ public class StartPerformance extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        //create a callable for each method
-        //String data[];
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String action=req.getServletPath();
         try {
             if(action.equals("/start")){
+                JSONObject jmxData= InputHandler.getJMXDetails();
+                JMXConnectionHandler.host=jmxData.getString("jmxhost");
+                JMXConnectionHandler.port=jmxData.getString("jmxport_ueba");
+                System.out.println(JMXConnectionHandler.host);
+                System.out.println(JMXConnectionHandler.port);
+                JMXConnector connector=JMXConnectionHandler.getConnector();
+                JMXConnectionHandler.port=jmxData.getString("jmxport_es");
+                System.out.println(JMXConnectionHandler.port);
+                JMXConnector connector1=JMXConnectionHandler.getConnector();
+
                 Callable<Void> callable1 = () -> {
-                    map=CPUCalc.calcCpu();
-//                    System.out.println(map);
-//                    String newStr=new Gson().toJson(map);
-//                    System.out.println(newStr);
-//                    resp.setContentType("application/json");
-//                    resp.setCharacterEncoding("UTF-8");
-//                    resp.getWriter().write(newStr);
+                    uebaCpuMap=CPUCalc.calcCpuUeba(connector);
+                    System.out.println("Avg. CPU:"+Double.valueOf(uebaCpuMap.values().stream().mapToDouble(d->d).average().orElse(0)));
+                    System.out.println("Max CPU:"+ Collections.max(uebaCpuMap.values()));
+                    System.out.println("Min CPU:"+ Collections.min(uebaCpuMap.values()));
+                    data.put("avg_cpu_ueba", String.valueOf(Double.valueOf(uebaCpuMap.values().stream().mapToDouble(d->d).average().orElse(0))));
+                    data.put("max_cpu_ueba", String.valueOf(Collections.max(uebaCpuMap.values())));
+                    data.put("min_cpu_ueba", String.valueOf(Collections.min(uebaCpuMap.values())));
                     return null;
                 };
 
                 Callable<Void> callable2 = () -> {
-                    //HashMap test= (HashMap) MemoryCalc.calcMemory();
-                    //String json = new Gson().toJson(test);
-//                    String test= String.valueOf(MemoryCalc.calcMemory());
-                    map1=MemoryCalc.calcMemory();
-//                    System.out.println(map1);
-//                    String newStr=new Gson().toJson(map1);
-//                    System.out.println(newStr);
-//                    resp.setContentType("application/json");
-//                    resp.setCharacterEncoding("UTF-8");
-//                    resp.getWriter().write(newStr);
+                    uebaMemoryMap=MemoryCalc.calcMemoryUeba(connector);
+                    System.out.println("Avg. Memory:"+Double.valueOf(uebaMemoryMap.values().stream().mapToDouble(d->d).average().orElse(0)));
+                    System.out.println("Max Memory:"+ Collections.max(uebaMemoryMap.values()));
+                    System.out.println("Min Memory:"+ Collections.min(uebaMemoryMap.values()));
+                    data.put("avg_memory_ueba", String.valueOf(uebaMemoryMap.values().stream().mapToDouble(d -> d).average().orElse(0)));
+                    data.put("max_memory_ueba", String.valueOf(Collections.max(uebaMemoryMap.values())));
+                    data.put("min_memory_ueba", String.valueOf(Collections.min(uebaMemoryMap.values())));
                     return null;
                 };
 
                 Callable<Void> callable3 = () -> {
+                    esCpuMap=CPUCalc.calcCpuEs(connector1);
+                    System.out.println("Avg. CPU:"+Double.valueOf(esCpuMap.values().stream().mapToDouble(d->d).average().orElse(0)));
+                    System.out.println("Max CPU:"+ Collections.max(esCpuMap.values()));
+                    System.out.println("Min CPU:"+ Collections.min(esCpuMap.values()));
+                    data.put("avg_cpu_es", String.valueOf(esCpuMap.values().stream().mapToDouble(d -> d).average().orElse(0)));
+                    data.put("max_cpu_es", String.valueOf(Collections.max(esCpuMap.values())));
+                    data.put("min_cpu_es", String.valueOf(Collections.min(esCpuMap.values())));
+                    return null;
+                };
+
+                Callable<Void> callable4 = () -> {
+                    esMemoryMap=MemoryCalc.calcMemoryEs(connector1);
+                    System.out.println("Avg. Memory:"+Double.valueOf(esMemoryMap.values().stream().mapToDouble(d->d).average().orElse(0)));
+                    System.out.println("Max Memory:"+ Collections.max(esMemoryMap.values()));
+                    System.out.println("Min Memory:"+ Collections.min(esMemoryMap.values()));
+                    data.put("avg_memory_es", String.valueOf(esMemoryMap.values().stream().mapToDouble(d -> d).average().orElse(0)));
+                    data.put("max_memory_es", String.valueOf(Collections.max(esMemoryMap.values())));
+                    data.put("min_memory_es", String.valueOf(Collections.min(esMemoryMap.values())));
+                    return null;
+                };
+
+                Callable<Void> callable5 = () -> {
                     maxTime=Integer.MAX_VALUE;
                     seconds=0;
                     while (seconds<maxTime){
                         seconds++;
                         System.out.println(seconds);
-                        Thread.sleep(1000);
+                        Thread.sleep(3000);
                     }
                     CPUCalc.flag=false;
                     MemoryCalc.flag=false;
                     return null;
                 };
 
-//                Callable<Void> callable4 = () -> {
-//
-//                    map=CPUCalc.calcCpu();
-//                    return null;
-//                };
-
-                //add to a list
-                List<Callable<Void>> taskList = new ArrayList<Callable<Void>>();
+                List<Callable<Void>> taskList = new ArrayList<>();
                 taskList.add(callable1);
                 taskList.add(callable2);
                 taskList.add(callable3);
-//                taskList.add(callable4);
+                taskList.add(callable4);
+                taskList.add(callable5);
 
-                //create a pool executor with 3 threads
-                ExecutorService executor = Executors.newFixedThreadPool(3);
+
+                ExecutorService executor = Executors.newFixedThreadPool(5);
 
                 try
                 {
-                    //start the threads and wait for them to finish
                     executor.invokeAll(taskList);
-                    map.putAll(map1);
-                    System.out.println(map);
-                    String newStr=new Gson().toJson(map);
-                    System.out.println(newStr);
+//                    map.putAll(map1);
+//                    map2.putAll(map3);
+//                    for (Map.Entry<String, Double> me: map2.entrySet()){
+//                        map4.put("es_"+me.getKey()+"",me.getValue());
+//                    }
+//                    map.putAll(map4);
+                    System.out.println(uebaCpuMap);
+                    System.out.println(uebaMemoryMap);
+                    System.out.println(esCpuMap);
+                    System.out.println(esMemoryMap);
+                    System.out.println(data);
+                    String newStr=new Gson().toJson(data);
                     resp.setContentType("application/json");
                     resp.setCharacterEncoding("UTF-8");
                     resp.getWriter().write(newStr);
-                    //System.exit(0);
                 }
                 catch (InterruptedException ie)
                 {
-                    //do something if you care about interruption;
                 }
             }
         } catch (Exception e) {
@@ -126,5 +148,4 @@ public class StartPerformance extends HttpServlet {
         }
 
     }
-
 }

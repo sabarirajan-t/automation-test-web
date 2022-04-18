@@ -70,11 +70,19 @@
         <script>
             $(document).on("click", "#somebutton", function() {
                 $.get("start", function(responseJson) { 
-                    console.log(responseJson['max_memory']);
-                    $("#maxmemory").append(responseJson['max_memory']);
-                    $("#avgmemory").append(responseJson['avg_memory']);
-                    $("#maxcpu").append(responseJson['max_cpu']);
-                    $("#avgcpu").append(responseJson['avg_cpu']);
+                    console.log(responseJson['max_memory_ueba']);
+                    $("#maxmemory").append(responseJson['max_memory_ueba']);
+                    $("#avgmemory").append(responseJson['avg_memory_ueba']);
+                    $("#minmemory").append(responseJson['min_memory_ueba']);
+                    $("#maxcpu").append(responseJson['max_cpu_ueba']);
+                    $("#avgcpu").append(responseJson['avg_cpu_ueba']);
+                    $("#mincpu").append(responseJson['min_cpu_ueba']);
+                    $("#maxmemory_es").append(responseJson['max_memory_es']);
+                    $("#avgmemory_es").append(responseJson['avg_memory_es']);
+                    $("#minmemory_es").append(responseJson['min_memory_es']);
+                    $("#maxcpu_es").append(responseJson['max_cpu_es']);
+                    $("#avgcpu_es").append(responseJson['avg_cpu_es']);
+                    $("#mincpu_es").append(responseJson['min_cpu_es']);
                 });
             });
         </script>
@@ -93,15 +101,19 @@
         <div id="somediv"><h2>UEBA:</h2></div>
         <p id="maxmemory">Max. Memory:</p>
         <p id="avgmemory">Avg. Memory:</p>
+        <p id="minmemory">Min. Memory:</p>
         <p id="maxcpu">Max. CPU:</p>
         <p id="avgcpu">Avg. CPU:</p>
+        <p id="mincpu">MIn. CPU:</p>
         <br>
         <br>
         <div id="somediv"><h2>ES:</h2></div>
-        <p id="maxmemory">Max. Memory:</p>
-        <p id="avgmemory">Avg. Memory:</p>
-        <p id="maxcpu">Max. CPU:</p>
-        <p id="avgcpu">Avg. CPU:</p>
+        <p id="maxmemory_es">Max. Memory:</p>
+        <p id="avgmemory_es">Avg. Memory:</p>
+        <p id="minmemory_es">Min. Memory:</p>
+        <p id="maxcpu_es">Max. CPU:</p>
+        <p id="avgcpu_es">Avg. CPU:</p>
+        <p id="mincpu_es">Min. CPU:</p>
     </body>
 </html>
 

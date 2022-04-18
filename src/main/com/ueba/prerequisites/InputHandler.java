@@ -3,16 +3,21 @@ package com.ueba.prerequisites;
 import org.json.JSONObject;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
 
 public class InputHandler{
 
-    FileInputStream fileInputStream=new FileInputStream("resources/Inputs.properties");
+
     public static Properties props=new Properties();
 
-    public InputHandler() throws IOException {
+    public InputHandler() throws FileNotFoundException {
+    }
+
+    public static void loadData() throws IOException {
+        FileInputStream fileInputStream=new FileInputStream("C:\\Users\\sabari-11074\\IdeaProjects\\automation-test-web\\resources\\Inputs.properties");
         props.load(fileInputStream);
     }
 
@@ -39,11 +44,12 @@ public class InputHandler{
         return dbDetails;
     }
 
-    public static JSONObject getJMXDetails(){
+    public static JSONObject getJMXDetails() throws IOException {
+        loadData();
         JSONObject jmxDetails=new JSONObject();
-        jmxDetails.put("jmxHost",props.getProperty("jmxhost"));
-        jmxDetails.put("jmxPortUeba",props.getProperty("jmxport_ueba"));
-        jmxDetails.put("jmxPortEs",props.getProperty("jmxport_es"));
+        jmxDetails.put("jmxhost",props.getProperty("jmxhost"));
+        jmxDetails.put("jmxport_ueba",props.getProperty("jmxport_ueba"));
+        jmxDetails.put("jmxport_es",props.getProperty("jmxport_es"));
         return jmxDetails;
     }
 
