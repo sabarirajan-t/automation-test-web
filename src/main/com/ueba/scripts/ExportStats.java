@@ -23,7 +23,7 @@ public class ExportStats {
     public static Statement statement;
     public static ResultSet resultSet;
     public void doExport(String format) throws IOException {
-        String request = "{\"inputParams\":{\"reportId\":97,\"businessHour\":0,\"endDate\":\"1647973799\",\"cvIdList\":[{\"cvID\":267,\"name\":\"New+Process+on+Server+by+User+(Pattern+Based)\",\"criteriaType\":\"-1\"}],\"reportCategoryType\":1,\"businessInputList\":[{\"id\":\"0\",\"value\":\"All\"},{\"id\":\"1\",\"value\":\"Business\"},{\"id\":\"2\",\"value\":\"Non-Business\"}],\"showMakeAsDefaultReport\":true,\"chartInputList\":[{\"name\":\"ueba.ReportGraphs.oneday_twoday\",\"value\":\"1;;;2\"},{\"name\":\"ueba.ReportGraphs.oneday_oneweek\",\"value\":\"1;;;7\"},{\"name\":\"ueba.ReportGraphs.oneweek_onemonth\",\"value\":\"7;;;30\"}],\"reportType\":\"report\",\"chosenServerValue\":\"Last+30+Days\",\"selectedUserServer\":\"0\",\"activeTabId\":\"tabId_267\",\"selectedHour\":0,\"isBusinessHourConfigured\":true,\"reportDetailsMap\":{\"REPORT_ENABLED\":true,\"REPORT_TYPE\":2,\"LOGIN_ID\":1,\"IS_ENABLED\":true,\"UEBA_REPORT_NAME_zh_CN\":\"进程监视\",\"PRIORITY\":5,\"UEBA_REPORT_ID\":97,\"REPORT_CATEGORY_TYPE\":1,\"UEBA_REPORT_NAME_ja_JP\":\"プロセス監視\",\"REPORT_CATEGORY_ID\":13,\"UEBA_REPORT_NAME\":\"Process+Monitoring\",\"IS_PREDEFINED_REPORT\":true,\"TITLE\":\"Process+Monitoring\",\"TILE_NAME\":\"report\",\"DISPLAY_TYPE\":\"BOTH\",\"UEBA_REPORT_NAME_en_US\":\"Process+Monitoring\"},\"startDate\":\"1645381800\",\"isClusterModelAvailable\":true},\"tabInputParams\":{\"cvId\":267,\"tabId\":\"tabId_267\",\"tabName\":\"tabName_267\",\"defaultFlag\":false,\"displayName\":\"New+Process+on+Server+by+User+(Pattern+Based)\",\"criteriaType\":-1,\"totalCount\":13,\"tabIdh\":\"#tabId_267\",\"rangeList\":[{\"value\":\"25\"},{\"value\":\"50\"},{\"value\":\"75\"},{\"value\":\"100\"}],\"showAddOrRemove\":true,\"showFilter\":true,\"showAdvSearch\":true,\"showAdvSearchMethod\":\"advSearchAction\",\"startValue\":1,\"rangeValue\":25,\"showAllColFlag\":true,\"hideTopDivider\":true,\"showLoading\":false},\"exportType\":\"[EXPORT_FORMAT]\",\"chartType\":\"verticalbar3d\"}";
+        String request = "{\"inputParams\":{\"reportId\":59,\"businessHour\":0,\"endDate\":\"1651084199\",\"cvIdList\":[{\"cvID\":162,\"name\":\"Time+Based\",\"criteriaType\":\"2\"},{\"cvID\":163,\"name\":\"Count+Based\",\"criteriaType\":\"2\"},{\"cvID\":164,\"name\":\"Pattern+Based\",\"criteriaType\":\"-1\"}],\"reportCategoryType\":1,\"businessInputList\":[{\"id\":\"0\",\"value\":\"All\"},{\"id\":\"1\",\"value\":\"Business\"},{\"id\":\"2\",\"value\":\"Non-Business\"}],\"showMakeAsDefaultReport\":true,\"chartInputList\":[{\"name\":\"ueba.ReportGraphs.oneday_twoday\",\"value\":\"1;;;2\"},{\"name\":\"ueba.ReportGraphs.oneday_oneweek\",\"value\":\"1;;;7\"},{\"name\":\"ueba.ReportGraphs.oneweek_onemonth\",\"value\":\"7;;;30\"}],\"reportType\":\"report\",\"chosenServerValue\":\"Last+30+Days\",\"selectedUserServer\":\"0\",\"activeTabId\":\"tabId_162\",\"selectedHour\":0,\"isBusinessHourConfigured\":true,\"reportDetailsMap\":{\"REPORT_ENABLED\":true,\"REPORT_TYPE\":2,\"LOGIN_ID\":1,\"IS_ENABLED\":true,\"UEBA_REPORT_NAME_zh_CN\":\"登录\",\"PRIORITY\":1,\"UEBA_REPORT_ID\":59,\"REPORT_CATEGORY_TYPE\":1,\"UEBA_REPORT_NAME_ja_JP\":\"ログオン\",\"REPORT_CATEGORY_ID\":18,\"UEBA_REPORT_NAME\":\"Logons\",\"IS_PREDEFINED_REPORT\":true,\"TITLE\":\"Logons\",\"TILE_NAME\":\"report\",\"DISPLAY_TYPE\":\"BOTH\",\"UEBA_REPORT_NAME_en_US\":\"Logons\"},\"startDate\":\"1648492200\",\"isClusterModelAvailable\":true},\"tabInputParams\":{\"cvId\":164,\"tabId\":\"tabId_164\",\"tabName\":\"tabName_164\",\"defaultFlag\":false,\"displayName\":\"Pattern+Based\",\"criteriaType\":-1,\"totalCount\":50,\"tabIdh\":\"#tabId_164\",\"rangeList\":[{\"value\":\"25\"},{\"value\":\"50\"},{\"value\":\"75\"},{\"value\":\"100\"}],\"showAddOrRemove\":true,\"showFilter\":true,\"showAdvSearch\":true,\"showAdvSearchMethod\":\"advSearchAction\",\"startValue\":1,\"rangeValue\":25,\"showAllColFlag\":true,\"hideTopDivider\":true,\"showLoading\":false},\"exportType\":\"[EXPORT_FORMAT]\",\"chartType\":\"verticalbar3d\"}";
         request = request.replace("[EXPORT_FORMAT]", format);
         String url = ""+hostDetails.getString("baseUrl")+"/RestAPI/WC/Export?mTCall=exportData";
         RequestBody formData = new FormBody.Builder()
@@ -78,7 +78,7 @@ public class ExportStats {
         }
     }
 
-    public void showData(String uniqueId) throws SQLException {
+    public static void showData(String uniqueId) throws SQLException {
         String getData="Select * from EXPORT_STATS where UniqueId='"+uniqueId+"'";
         resultSet=statement.executeQuery(getData);
         System.out.println("\n*********************************************\n");
@@ -92,7 +92,7 @@ public class ExportStats {
         }
     }
 
-    public void calcStats() throws IOException, InterruptedException, SQLException, ClassNotFoundException {
+    public static void calcStats() throws IOException, InterruptedException, SQLException, ClassNotFoundException {
         sessionDetails=LoginHandler.getSessionDetails();
         String[] formats={"CSV","PDF","XLS","HTML"};
         String uniqueID = UUID.randomUUID().toString();

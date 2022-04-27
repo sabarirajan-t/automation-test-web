@@ -9,25 +9,20 @@ import java.util.Properties;
 
 
 public class InputHandler{
-
-
-    public static Properties props=new Properties();
-
-    public InputHandler() throws FileNotFoundException {
-    }
+    static Properties props=new Properties();
 
     public static void loadData() throws IOException {
         FileInputStream fileInputStream=new FileInputStream("C:\\Users\\sabari-11074\\IdeaProjects\\automation-test-web\\resources\\Inputs.properties");
         props.load(fileInputStream);
     }
 
-    public static JSONObject getHostDetails(){
+    public static JSONObject getHostDetails() {
         JSONObject hostDetails=new JSONObject();
         hostDetails.put("baseUrl",props.getProperty("baseUrl"));
         return hostDetails;
     }
 
-    public static JSONObject getUserCreds(){
+    public static JSONObject getUserCreds() {
         JSONObject userCreds=new JSONObject();
         userCreds.put("username",props.getProperty("username"));
         userCreds.put("password",props.getProperty("password"));
@@ -35,7 +30,7 @@ public class InputHandler{
         return userCreds;
     }
 
-    public static JSONObject getDbDetails(){
+    public static JSONObject getDbDetails() {
         JSONObject dbDetails=new JSONObject();
         dbDetails.put("dbserver",props.getProperty("dbserver"));
         dbDetails.put("dbname",props.getProperty("dbname"));
@@ -45,7 +40,6 @@ public class InputHandler{
     }
 
     public static JSONObject getJMXDetails() throws IOException {
-        loadData();
         JSONObject jmxDetails=new JSONObject();
         jmxDetails.put("jmxhost",props.getProperty("jmxhost"));
         jmxDetails.put("jmxport_ueba",props.getProperty("jmxport_ueba"));

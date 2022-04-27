@@ -17,7 +17,7 @@ public class MemoryCalc {
             Object obj = connector.getMBeanServerConnection().getAttribute(new ObjectName("java.lang:type=Memory"), "HeapMemoryUsage");
             CompositeData cd = (CompositeData) obj;
             memoryMapUeba.putAll(FormatData.formatMemory((long)cd.get("used")/(1024*1024)));
-            Thread.sleep(3000);
+            Thread.sleep(1000);
         }
         return memoryMapUeba;
     }
@@ -27,7 +27,7 @@ public class MemoryCalc {
             Object obj = connector.getMBeanServerConnection().getAttribute(new ObjectName("java.lang:type=Memory"), "HeapMemoryUsage");
             CompositeData cd = (CompositeData) obj;
             memoryMapEs.putAll(FormatData.formatMemory((long)cd.get("used")/(1024*1024)));
-            Thread.sleep(3000);
+            Thread.sleep(1000);
         }
         return memoryMapEs;
     }

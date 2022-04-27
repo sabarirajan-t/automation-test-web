@@ -14,7 +14,7 @@ public class CPUCalc {
         while(flag){
             Object obj = connector.getMBeanServerConnection().getAttribute(new ObjectName("java.lang:type=OperatingSystem"), "ProcessCpuLoad");
             cpuMapUeba.putAll(FormatData.formatCpu((double)obj*100));
-            Thread.sleep(3000);
+            Thread.sleep(1000);
         }
         return cpuMapUeba;
     }
@@ -23,7 +23,7 @@ public class CPUCalc {
         while(flag){
             Object obj = connector.getMBeanServerConnection().getAttribute(new ObjectName("java.lang:type=OperatingSystem"), "ProcessCpuLoad");
             cpuMapEs.putAll(FormatData.formatCpu((double)obj*100));
-            Thread.sleep(3000);
+            Thread.sleep(1000);
         }
         return cpuMapEs;
     }

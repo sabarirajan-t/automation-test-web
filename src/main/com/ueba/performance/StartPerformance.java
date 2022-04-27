@@ -2,6 +2,7 @@ package com.ueba.performance;
 
 import com.google.gson.Gson;
 import com.ueba.prerequisites.InputHandler;
+import com.ueba.scripts.ExportStats;
 import org.json.JSONObject;
 
 import javax.management.remote.JMXConnector;
@@ -32,6 +33,9 @@ public class StartPerformance extends HttpServlet {
         try{
             if(action.equals("tostop")){
                 seconds=maxTime;
+            } else if (action.equals("export")) {
+                InputHandler.loadData();
+                ExportStats.calcStats();
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -103,7 +107,7 @@ public class StartPerformance extends HttpServlet {
                     while (seconds<maxTime){
                         seconds++;
                         System.out.println(seconds);
-                        Thread.sleep(3000);
+                        Thread.sleep(1000);
                     }
                     CPUCalc.flag=false;
                     MemoryCalc.flag=false;
@@ -117,18 +121,11 @@ public class StartPerformance extends HttpServlet {
                 taskList.add(callable4);
                 taskList.add(callable5);
 
-
                 ExecutorService executor = Executors.newFixedThreadPool(5);
 
                 try
                 {
                     executor.invokeAll(taskList);
-//                    map.putAll(map1);
-//                    map2.putAll(map3);
-//                    for (Map.Entry<String, Double> me: map2.entrySet()){
-//                        map4.put("es_"+me.getKey()+"",me.getValue());
-//                    }
-//                    map.putAll(map4);
                     System.out.println(uebaCpuMap);
                     System.out.println(uebaMemoryMap);
                     System.out.println(esCpuMap);

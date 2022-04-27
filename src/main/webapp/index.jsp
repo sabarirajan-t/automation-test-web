@@ -68,7 +68,7 @@
         <title>Test</title>
         <script src="http://code.jquery.com/jquery-latest.min.js"></script>
         <script>
-            $(document).on("click", "#somebutton", function() {
+            $(document).on("click", "#startBtn", function() {
                 $.get("start", function(responseJson) { 
                     console.log(responseJson['max_memory_ueba']);
                     $("#maxmemory").append(responseJson['max_memory_ueba']);
@@ -87,17 +87,25 @@
             });
         </script>
         <script>
-            $(document).on("click", "#somebutton1", function() {
+            $(document).on("click", "#stopBtn", function() {
                 $.post("stop",{ param : "tostop"},function() { 
                     console.log("stopped");
                 });
             });
 
         </script>
+        <script>
+            $(document).on("click", "#exportBtn", function() {
+                $.post("export",{ param : "export"},function() { 
+                    console.log("export starting");
+                });
+            });
+
+        </script>
     </head>
     <body>
-        <button id="somebutton">Start CPU and Memory Performance</button>
-        <button id="somebutton1">Stop CPU and Memory Performance</button>
+        <button id="startBtn">Start CPU and Memory Performance</button>
+        <button id="stopBtn">Stop CPU and Memory Performance</button>
         <div id="somediv"><h2>UEBA:</h2></div>
         <p id="maxmemory">Max. Memory:</p>
         <p id="avgmemory">Avg. Memory:</p>
@@ -114,6 +122,35 @@
         <p id="maxcpu_es">Max. CPU:</p>
         <p id="avgcpu_es">Avg. CPU:</p>
         <p id="mincpu_es">Min. CPU:</p>
+        <div>
+        <div>
+        <button id="exportBtn">Start export Performance</button>
+        <h1>Export Stats</h1>
+<br>
+<table>
+  <tr>
+    <th>Date</th>
+    <th>Build No.</th>
+    <th>Validation Name</th>
+    <th>Trial</th>
+    <th>Format</th>
+    <th>Queuing Time</th>
+    <th>Export Time</th>
+    <th>Total Time</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>test</td>
+    <td>test</td>
+    <td>test</td>
+    <td>test</td>
+    <td>test</td>
+    <td>test</td>
+    <td>test</td>
+    <td>test</td>
+    <td>test</td>
+  </tr>
+</table>
     </body>
 </html>
 
