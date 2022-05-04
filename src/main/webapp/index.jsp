@@ -96,8 +96,30 @@
         </script>
         <script>
             $(document).on("click", "#exportBtn", function() {
-                $.post("export",{ param : "export"},function() { 
+                var testdate=$('#date').val();
+                var build_no=$('#build_no').val();
+                var vali_name=$('#vali_name').val();
+                var desc=$('#desc').val();
+                console.log(testdate);
+                console.log(build_no);
+                console.log(vali_name);
+                console.log(desc);
+                $.post("export",{ param : "export"},function(responseJson) { 
                     console.log("export starting");
+                    var tbody='';
+                    for(var i=0;i<responseJson.length;i++){
+                        tbody+="<tr>\
+                                <td>" + responseJson[i]['Format'] +" </td>\
+                                <td>" + responseJson[i]['QueueTime'] +" </td>\
+                                <td>" + responseJson[i]['ExportTime'] +" </td>\
+                                <td>" + responseJson[i]['TotalTime'] +" </td>\
+                                </tr>";
+                        // $("#format_td").html(responseJson[i]['Format']);
+                        // $("#queue_td").html(responseJson[i]['QueueTime']);
+                        // $("#export_td").html(responseJson[i]['ExportTime']);
+                        // $("#total_td").html(responseJson[i]['TotalTime']);  
+                    }
+                    $('#dataBody').html(tbody);
                 });
             });
 
@@ -124,7 +146,17 @@
         <p id="mincpu_es">Min. CPU:</p>
         <div>
         <div>
-        <button id="exportBtn">Start export Performance</button>
+        <div>
+        <div>
+        <label for="date">Date:</label>
+        <input type="datetime-local" id="date">
+        <label for="build_no">Build No.:</label>
+        <input type="text" id="build_no">
+        <label for="vali_name">Validation Name:</label>
+        <input type="text" id="vali_name">
+        <label for="desc">Description:</label>
+        <input type="textarea" id="desc">
+        <button id="exportBtn">Start Export Performance</button>
         <h1>Export Stats</h1>
 <br>
 <table>
@@ -132,25 +164,22 @@
     <th>Date</th>
     <th>Build No.</th>
     <th>Validation Name</th>
-    <th>Trial</th>
     <th>Format</th>
     <th>Queuing Time</th>
     <th>Export Time</th>
     <th>Total Time</th>
     <th>Description</th>
   </tr>
-  <tr>
-    <td>test</td>
-    <td>test</td>
-    <td>test</td>
-    <td>test</td>
-    <td>test</td>
-    <td>test</td>
-    <td>test</td>
-    <td>test</td>
-    <td>test</td>
-  </tr>
+  <tbody id="dataBody">
+  </tbody>
+  <%-- <tr>
+    <td id="format_td"></td>
+    <td id="queue_td">test</td>
+    <td id="export_td">test</td>
+    <td id="total_td">test</td>
+  </tr> --%>
 </table>
+<div id="somediv"></div>
     </body>
 </html>
 

@@ -11,8 +11,7 @@ import okhttp3.RequestBody;
 import org.json.JSONObject;
 import java.io.IOException;
 import java.sql.*;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class ExportStats {
@@ -78,21 +77,31 @@ public class ExportStats {
         }
     }
 
-    public static void showData(String uniqueId) throws SQLException {
+    public static List<Map<String, Object>> showData(String uniqueId) throws SQLException {
         String getData="Select * from EXPORT_STATS where UniqueId='"+uniqueId+"'";
         resultSet=statement.executeQuery(getData);
         System.out.println("\n*********************************************\n");
         System.out.println("Data from DB:");
         System.out.println("\n*********************************************\n");
+        ResultSetMetaData md = resultSet.getMetaData();
+        int columns = md.getColumnCount();
+        List<Map<String, Object>> list = new ArrayList<>();
         while(resultSet.next()){
+            Map<String, Object> row = new HashMap<>(columns);
+            for (int i = 1; i <= columns; ++i) {
+                row.put(md.getColumnName(i), resultSet.getObject(i));
+            }
+            list.add(row);
             System.out.println("Queuing time for "+resultSet.getString("Format")+" format:"+resultSet.getString("QueueTime"));
             System.out.println("Queuing time for "+resultSet.getString("Format")+" format:"+resultSet.getString("ExportTime"));
             System.out.println("Queuing time for "+resultSet.getString("Format")+" format:"+resultSet.getString("TotalTime"));
             System.out.println("\n*********************************************\n");
         }
+        System.out.println(list);
+        return list;
     }
 
-    public static void calcStats() throws IOException, InterruptedException, SQLException, ClassNotFoundException {
+    public static List calcStats() throws IOException, InterruptedException, SQLException, ClassNotFoundException {
         sessionDetails=LoginHandler.getSessionDetails();
         String[] formats={"CSV","PDF","XLS","HTML"};
         String uniqueID = UUID.randomUUID().toString();
@@ -123,7 +132,8 @@ public class ExportStats {
             obj.clearHistory();
             obj.storeDb(uniqueID,formats[i],obj.formatTime(queueTime),obj.formatTime(exportTime),obj.formatTime(overallTimeTaken));
         }
-        showData(uniqueID);
+        List l=showData(uniqueID);
+        return l;
     }
 }
 

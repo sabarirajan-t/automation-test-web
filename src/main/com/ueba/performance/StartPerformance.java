@@ -35,7 +35,12 @@ public class StartPerformance extends HttpServlet {
                 seconds=maxTime;
             } else if (action.equals("export")) {
                 InputHandler.loadData();
-                ExportStats.calcStats();
+                List list=ExportStats.calcStats();
+                System.out.println(list);
+                String json = new Gson().toJson(list);
+                resp.setContentType("application/json");
+                resp.setCharacterEncoding("UTF-8");
+                resp.getWriter().write(json);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
