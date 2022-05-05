@@ -30,12 +30,18 @@ public class StartPerformance extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         String action= req.getParameter("param");
+        String date=req.getParameter("date");
+        String buildNumber=req.getParameter("buildNo");
+        String validationName=req.getParameter("valName");
+        String desc=req.getParameter("description");
+        System.out.println(date+buildNumber+validationName+desc);
+
         try{
             if(action.equals("tostop")){
                 seconds=maxTime;
             } else if (action.equals("export")) {
                 InputHandler.loadData();
-                List list=ExportStats.calcStats();
+                List list=ExportStats.calcStats(req);
                 System.out.println(list);
                 String json = new Gson().toJson(list);
                 resp.setContentType("application/json");
@@ -52,6 +58,7 @@ public class StartPerformance extends HttpServlet {
         String action=req.getServletPath();
         try {
             if(action.equals("/start")){
+                InputHandler.loadData();
                 JSONObject jmxData= InputHandler.getJMXDetails();
                 JMXConnectionHandler.host=jmxData.getString("jmxhost");
                 JMXConnectionHandler.port=jmxData.getString("jmxport_ueba");

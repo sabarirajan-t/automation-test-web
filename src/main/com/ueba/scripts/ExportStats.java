@@ -9,6 +9,9 @@ import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import org.json.JSONObject;
+
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.sql.*;
 import java.util.*;
@@ -22,7 +25,7 @@ public class ExportStats {
     public static Statement statement;
     public static ResultSet resultSet;
     public void doExport(String format) throws IOException {
-        String request = "{\"inputParams\":{\"reportId\":59,\"businessHour\":0,\"endDate\":\"1651084199\",\"cvIdList\":[{\"cvID\":162,\"name\":\"Time+Based\",\"criteriaType\":\"2\"},{\"cvID\":163,\"name\":\"Count+Based\",\"criteriaType\":\"2\"},{\"cvID\":164,\"name\":\"Pattern+Based\",\"criteriaType\":\"-1\"}],\"reportCategoryType\":1,\"businessInputList\":[{\"id\":\"0\",\"value\":\"All\"},{\"id\":\"1\",\"value\":\"Business\"},{\"id\":\"2\",\"value\":\"Non-Business\"}],\"showMakeAsDefaultReport\":true,\"chartInputList\":[{\"name\":\"ueba.ReportGraphs.oneday_twoday\",\"value\":\"1;;;2\"},{\"name\":\"ueba.ReportGraphs.oneday_oneweek\",\"value\":\"1;;;7\"},{\"name\":\"ueba.ReportGraphs.oneweek_onemonth\",\"value\":\"7;;;30\"}],\"reportType\":\"report\",\"chosenServerValue\":\"Last+30+Days\",\"selectedUserServer\":\"0\",\"activeTabId\":\"tabId_162\",\"selectedHour\":0,\"isBusinessHourConfigured\":true,\"reportDetailsMap\":{\"REPORT_ENABLED\":true,\"REPORT_TYPE\":2,\"LOGIN_ID\":1,\"IS_ENABLED\":true,\"UEBA_REPORT_NAME_zh_CN\":\"登录\",\"PRIORITY\":1,\"UEBA_REPORT_ID\":59,\"REPORT_CATEGORY_TYPE\":1,\"UEBA_REPORT_NAME_ja_JP\":\"ログオン\",\"REPORT_CATEGORY_ID\":18,\"UEBA_REPORT_NAME\":\"Logons\",\"IS_PREDEFINED_REPORT\":true,\"TITLE\":\"Logons\",\"TILE_NAME\":\"report\",\"DISPLAY_TYPE\":\"BOTH\",\"UEBA_REPORT_NAME_en_US\":\"Logons\"},\"startDate\":\"1648492200\",\"isClusterModelAvailable\":true},\"tabInputParams\":{\"cvId\":164,\"tabId\":\"tabId_164\",\"tabName\":\"tabName_164\",\"defaultFlag\":false,\"displayName\":\"Pattern+Based\",\"criteriaType\":-1,\"totalCount\":50,\"tabIdh\":\"#tabId_164\",\"rangeList\":[{\"value\":\"25\"},{\"value\":\"50\"},{\"value\":\"75\"},{\"value\":\"100\"}],\"showAddOrRemove\":true,\"showFilter\":true,\"showAdvSearch\":true,\"showAdvSearchMethod\":\"advSearchAction\",\"startValue\":1,\"rangeValue\":25,\"showAllColFlag\":true,\"hideTopDivider\":true,\"showLoading\":false},\"exportType\":\"[EXPORT_FORMAT]\",\"chartType\":\"verticalbar3d\"}";
+        String request = "{\"SORTTYPE\":1,\"OPERATION\":\"EXPORT\",\"START_TIME\":\"2022-04-05T18:30:00.000Z\",\"END_TIME\":\"2022-05-05T18:29:59.000Z\",\"TABLE_NAME\":\"UEBA_VIEW_ALERTS\",\"filterData\":[],\"widgetData\":[],\"CUSTOM_STRUCTURE\":{\"REQUEST_PARAMS\":{\"USER_ID\":1},\"UNIQUE_ID\":\"UEBA_VIEW_ALERTS_1\"},\"isAlert\":true,\"chosenServerValue\":\"Last+30+Days\",\"exportType\":\"[EXPORT_FORMAT]\"}";
         request = request.replace("[EXPORT_FORMAT]", format);
         String url = ""+hostDetails.getString("baseUrl")+"/RestAPI/WC/Export?mTCall=exportData";
         RequestBody formData = new FormBody.Builder()
@@ -55,7 +58,11 @@ public class ExportStats {
         return timeFormatted;
     }
 
-    public void storeDb(String uniqueID,String format,String queueTime,String exportTime, String totalTime) throws SQLException, ClassNotFoundException {
+    public void storeDb(String uniqueID,String format,String queueTime,String exportTime, String totalTime,int entriesCount,HttpServletRequest req) throws SQLException, ClassNotFoundException {
+        String date=req.getParameter("date");
+        String buildNumber=req.getParameter("buildNo");
+        String validationName=req.getParameter("valName");
+        String desc=req.getParameter("description");
         dbconnection= DBHandler.connectDB();
         DatabaseMetaData dbm =dbconnection.getMetaData();
         statement=dbconnection.createStatement();
@@ -63,16 +70,21 @@ public class ExportStats {
         if(!resultSet.next()){
             String createTable="CREATE TABLE EXPORT_STATS (\n" +
                     "    UniqueId varchar(255),\n" +
+                    "    Date varchar(255),\n" +
+                    "    BuildNumber varchar(255),\n" +
+                    "    ValidationName varchar(255),\n" +
+                    "    Description varchar(255),\n" +
                     "    Format varchar(255),\n" +
                     "    QueueTime varchar(255),\n" +
                     "    ExportTime varchar(255),\n" +
                     "    TotalTime varchar(255),\n" +
+                    "    EntriesCount varchar(255),\n" +
                     ");";
             statement.executeUpdate(createTable);
         }
         else {
-            String insertData="INSERT INTO EXPORT_STATS (UniqueId, Format, QueueTime, ExportTime, TotalTime)\n" +
-                    "VALUES ('"+uniqueID+"','"+format+"', '"+queueTime+"', '"+exportTime+"', '"+totalTime+"')";
+            String insertData="INSERT INTO EXPORT_STATS (UniqueId, Date, BuildNumber, ValidationName, Description, Format, QueueTime, ExportTime, TotalTime, EntriesCount)\n" +
+                    "VALUES ('"+uniqueID+"','"+date+"','"+buildNumber+"','"+validationName+"','"+desc+"','"+format+"', '"+queueTime+"', '"+exportTime+"', '"+totalTime+"','"+entriesCount+"')";
             statement.executeUpdate(insertData);
         }
     }
@@ -101,7 +113,7 @@ public class ExportStats {
         return list;
     }
 
-    public static List calcStats() throws IOException, InterruptedException, SQLException, ClassNotFoundException {
+    public static List calcStats(HttpServletRequest request) throws IOException, InterruptedException, SQLException, ClassNotFoundException {
         sessionDetails=LoginHandler.getSessionDetails();
         String[] formats={"CSV","PDF","XLS","HTML"};
         String uniqueID = UUID.randomUUID().toString();
@@ -121,6 +133,10 @@ public class ExportStats {
                 responseData=obj.exportHistory();
                 Thread.sleep(1000);
             }
+            System.out.println(responseData);
+            JSONObject jsonObject=new JSONObject(responseData);
+            System.out.println(jsonObject);
+            int entriesCount=(Integer) jsonObject.getJSONArray("exportedHistory").getJSONObject(0).get("EXPORTED_ENTRIES");
             long exportEndTime=System.currentTimeMillis();
             long queueTime=queueEndTime-queueStartTime;
             long exportTime=exportEndTime-exportStartTime;
@@ -130,7 +146,7 @@ public class ExportStats {
             System.out.println("Overall time for "+formats[i]+" format:"+obj.formatTime(overallTimeTaken));
             System.out.println("\n*********************************************\n");
             obj.clearHistory();
-            obj.storeDb(uniqueID,formats[i],obj.formatTime(queueTime),obj.formatTime(exportTime),obj.formatTime(overallTimeTaken));
+            obj.storeDb(uniqueID,formats[i],obj.formatTime(queueTime),obj.formatTime(exportTime),obj.formatTime(overallTimeTaken),entriesCount,request);
         }
         List l=showData(uniqueID);
         return l;
